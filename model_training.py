@@ -1,9 +1,8 @@
+import datetime
 import os
 import uuid
 
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 import tensorflow as tf
 from keras import layers
 from keras.models import model_from_json
@@ -36,8 +35,15 @@ def save_model(model):
     model_json = model.to_json()
 
     # make unique directory for model saving
-    dir_path = "models/" + str(uuid.uuid4())
-    os.mkdir(dir_path)
+    dir_path = (
+        "models/"
+        + datetime.date.today().strftime("%Y")
+        + "/"
+        + datetime.date.today().strftime("%m")
+        + "/"
+        + str(uuid.uuid4())
+    )
+    os.makedirs(dir_path)
 
     # save model as a json file
     with open(dir_path + "/model.json", "w") as json_file:
@@ -76,9 +82,24 @@ def train_model(
 
 
 def train_model_v2(
+    cfg={},
     label_fields="attack",
     file_path="data/KDDTrain.csv",
 ):
+    # Model training config
+    config = {
+        "activation": "relu",
+        "additional_activation": "softmax",
+        "loss": "categorical_crossentropy",
+        "optimizer": "adam",
+        "batch_size": 64,
+        "epochs": 5,
+        "test_size": 0.2,
+        "random_state": 42,
+        "save_to_disk": True,
+    }
+    config.update(cfg)
+
     # Read the dataset from a CSV file
     data = processing_data.read_and_prepare_data(file_path, label_fields)
     X = np.array(data["training_data"])
@@ -86,7 +107,7 @@ def train_model_v2(
 
     # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
+        X, y, test_size=config["test_size"], random_state=config["random_state"]
     )
 
     # Preprocessing
@@ -101,36 +122,39 @@ def train_model_v2(
     # Build the neural network model
     model = tf.keras.Sequential()
     model.add(
-        tf.keras.layers.Dense(64, activation="relu", input_shape=(X_train.shape[1],))
+        tf.keras.layers.Dense(
+            num_classes,
+            activation=config["activation"],
+            input_shape=(X_train.shape[1],),
+        )
     )
-    model.add(tf.keras.layers.Dense(64, activation="relu"))
-    model.add(tf.keras.layers.Dense(64, activation="relu"))
-    model.add(tf.keras.layers.Dense(64, activation="relu"))
-    model.add(tf.keras.layers.Dense(64, activation="relu"))
-    model.add(tf.keras.layers.Dense(num_classes, activation="softmax"))
+    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+    model.add(
+        tf.keras.layers.Dense(num_classes, activation=config["additional_activation"])
+    )
 
     # Compile the model
     model.compile(
-        loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"]
+        loss=config["loss"], optimizer=config["optimizer"], metrics=["accuracy"]
     )
 
     # Train the model
-    batch_size = 64
-    epochs = 5
     model.fit(
         X_train,
         y_train,
-        batch_size=batch_size,
-        epochs=epochs,
+        batch_size=config["batch_size"],
+        epochs=config["epochs"],
         validation_data=(X_test, y_test),
     )
 
     # Evaluate the model
-    loss, accuracy = model.evaluate(X_test, y_test)
-    print("Test loss:", loss)
-    print("Test accuracy:", accuracy)
+    # loss, accuracy = model.evaluate(X_test, y_test)
+    # print("Test loss:", loss)
+    # print("Test accuracy:", accuracy)
 
     # save model to json
-    save_model(model)
-
-    return {"loss": loss, "accuracy": accuracy}
+    if config["save_to_disk"]:
+        save_model(model)

@@ -1,14 +1,9 @@
-from typing import Annotated, Any
-
 from fastapi import BackgroundTasks, Depends, FastAPI, Form, UploadFile
 from pydantic import BaseModel
 
 import model_training
 
 app = FastAPI()
-
-
-# to run a server go to project root and run: uvicorn main:app --reload
 
 
 class AppModel(BaseModel):
@@ -26,6 +21,7 @@ async def read_root() -> AppModel:
     )
 
 
+# Train model API endpoint (BEGIN)
 class TrainModel(BaseModel):
     labels_field: str = Form(...)
     file: UploadFile = Form(...)
@@ -39,8 +35,6 @@ class TrainModelResponse(BaseModel):
     filename: str
     file_size: int
     labels_field: str
-    uuid: str
-    is_model_training: bool
 
 
 @app.post("/train_model")
@@ -58,6 +52,9 @@ async def train_model(
         filename=form_data.file.filename,
         file_size=form_data.file.size,
         labels_field=form_data.labels_field,
-        # uuid="qwerty123test",
-        # is_model_training=True,
     )
+
+
+# Train model API endpoint (END)
+
+# To run the server: uvicorn main:app --reload
