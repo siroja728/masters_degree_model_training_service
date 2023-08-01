@@ -30,7 +30,7 @@ def create_model(max_label):
     return model
 
 
-def save_model(model):
+def save_model(model, uuid):
     # serialize model to JSON
     model_json = model.to_json()
 
@@ -41,17 +41,25 @@ def save_model(model):
         + "/"
         + datetime.date.today().strftime("%m")
         + "/"
-        + str(uuid.uuid4())
+        + str(uuid)
     )
+
     os.makedirs(dir_path)
 
+    model_json_path = dir_path + "/model.json"
+    model_weights_path = dir_path + "/model.h5"
+
     # save model as a json file
-    with open(dir_path + "/model.json", "w") as json_file:
+    with open(model_json_path, "w") as json_file:
         json_file.write(model_json)
 
     # serialize weights to HDF5
-    model.save_weights(dir_path + "/model.h5")
-    print("Saved model to disk")
+    model.save_weights(model_weights_path)
+
+    return {
+        "model_json_path": model_json_path,
+        "model_weights_path": model_weights_path,
+    }
 
 
 def load_model(path_to_model):
@@ -82,24 +90,10 @@ def train_model(
 
 
 def train_model_v2(
-    cfg={},
+    config,
     label_fields="attack",
     file_path="data/KDDTrain.csv",
 ):
-    # Model training config
-    config = {
-        "activation": "relu",
-        "additional_activation": "softmax",
-        "loss": "categorical_crossentropy",
-        "optimizer": "adam",
-        "batch_size": 64,
-        "epochs": 5,
-        "test_size": 0.2,
-        "random_state": 42,
-        "save_to_disk": True,
-    }
-    config.update(cfg)
-
     # Read the dataset from a CSV file
     data = processing_data.read_and_prepare_data(file_path, label_fields)
     X = np.array(data["training_data"])
@@ -150,11 +144,8 @@ def train_model_v2(
         validation_data=(X_test, y_test),
     )
 
-    # Evaluate the model
-    # loss, accuracy = model.evaluate(X_test, y_test)
-    # print("Test loss:", loss)
-    # print("Test accuracy:", accuracy)
-
     # save model to json
-    if config["save_to_disk"]:
-        save_model(model)
+    saved_model = save_model(model, config["uuid"])
+    saved_model.update({"uuid": str(config["uuid"])})
+
+    print(saved_model)
