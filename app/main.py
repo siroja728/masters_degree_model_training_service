@@ -4,7 +4,7 @@ from typing import Annotated, List, Literal
 from fastapi import BackgroundTasks, FastAPI, Form, UploadFile
 from pydantic import BaseModel
 
-import model_training
+from app.model_training import train_model_v2
 
 activation_functions = Literal[
     "elu",
@@ -117,7 +117,7 @@ def train_model(
 ):
     model_uuid = uuid.uuid4()
     background_tasks.add_task(
-        model_training.train_model_v2,
+        train_model_v2,
         config={
             "uuid": model_uuid,
             "activation": activation,

@@ -1,0 +1,11 @@
+services:
+  api:
+    build: .
+    container_name: model-training-service
+    environment:
+      PORT: 8000
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./app:/model_service/app
+    restart: "no"

@@ -1,6 +1,5 @@
 import datetime
 import os
-import uuid
 
 import numpy as np
 import tensorflow as tf
@@ -9,7 +8,7 @@ from keras.models import model_from_json
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
-import processing_data
+from app.processing_data import read_and_prepare_data
 
 
 def create_model(max_label):
@@ -78,7 +77,7 @@ def train_model(
     label_fields="attack",
     file_path="data/KDDTrain.csv",
 ):
-    data = processing_data.read_and_prepare_data("data/KDDTrain.csv", label_fields)
+    data = read_and_prepare_data(file_path, label_fields)
     features = data["training_data"]
     labels = data["labels"]
     max_label = max(labels) + 1
@@ -95,7 +94,7 @@ def train_model_v2(
     file_path="data/KDDTrain.csv",
 ):
     # Read the dataset from a CSV file
-    data = processing_data.read_and_prepare_data(file_path, label_fields)
+    data = read_and_prepare_data(file_path, label_fields)
     X = np.array(data["training_data"])
     y = np.array(data["labels"])
 
