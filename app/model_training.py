@@ -93,58 +93,69 @@ def train_model_v2(
     label_fields="attack",
     file_path="data/KDDTrain.csv",
 ):
-    # Read the dataset from a CSV file
-    data = read_and_prepare_data(file_path, label_fields)
-    X = np.array(data["training_data"])
-    y = np.array(data["labels"])
+    try:
+        # Read the dataset from a CSV file
+        data = read_and_prepare_data(file_path, label_fields)
+        X = np.array(data["training_data"])
+        y = np.array(data["labels"])
 
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=config["test_size"], random_state=config["random_state"]
-    )
-
-    # Preprocessing
-    X_train = (X_train - np.mean(X_train)) / np.std(X_train)
-    X_test = (X_test - np.mean(X_train)) / np.std(X_train)
-
-    # Convert labels to one-hot encoding
-    num_classes = len(np.unique(y))  # Number of unique classes in the labels
-    y_train = tf.keras.utils.to_categorical(y_train, num_classes)
-    y_test = tf.keras.utils.to_categorical(y_test, num_classes)
-
-    # Build the neural network model
-    model = tf.keras.Sequential()
-    model.add(
-        tf.keras.layers.Dense(
-            num_classes,
-            activation=config["activation"],
-            input_shape=(X_train.shape[1],),
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=config["test_size"], random_state=config["random_state"]
         )
-    )
-    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-    model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-    model.add(
-        tf.keras.layers.Dense(num_classes, activation=config["additional_activation"])
-    )
 
-    # Compile the model
-    model.compile(
-        loss=config["loss"], optimizer=config["optimizer"], metrics=["accuracy"]
-    )
+        # Preprocessing
+        X_train = (X_train - np.mean(X_train)) / np.std(X_train)
+        X_test = (X_test - np.mean(X_train)) / np.std(X_train)
 
-    # Train the model
-    model.fit(
-        X_train,
-        y_train,
-        batch_size=config["batch_size"],
-        epochs=config["epochs"],
-        validation_data=(X_test, y_test),
-    )
+        # Convert labels to one-hot encoding
+        num_classes = len(np.unique(y))  # Number of unique classes in the labels
+        y_train = tf.keras.utils.to_categorical(y_train, num_classes)
+        y_test = tf.keras.utils.to_categorical(y_test, num_classes)
 
-    # save model to json
-    saved_model = save_model(model, config["uuid"])
-    saved_model.update({"uuid": str(config["uuid"])})
+        # Build the neural network model
+        model = tf.keras.Sequential()
+        model.add(
+            tf.keras.layers.Dense(
+                num_classes,
+                activation=config["activation"],
+                input_shape=(X_train.shape[1],),
+            )
+        )
+        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
+        model.add(
+            tf.keras.layers.Dense(
+                num_classes, activation=config["additional_activation"]
+            )
+        )
 
-    print(saved_model)
+        # Compile the model
+        model.compile(
+            loss=config["loss"], optimizer=config["optimizer"], metrics=["accuracy"]
+        )
+
+        # Train the model
+        model.fit(
+            X_train,
+            y_train,
+            batch_size=config["batch_size"],
+            epochs=config["epochs"],
+            validation_data=(X_test, y_test),
+        )
+
+        # save model to json
+        saved_model = save_model(model, config["uuid"])
+        saved_model.update({"uuid": str(config["uuid"])})
+
+        print(
+            "Successfully train model. Send data to main service via request or web sockets.",
+            saved_model,
+        )
+    except:
+        print(
+            "Error train model. Send data to main service via request or web sockets.",
+            {"uuid": str(config["uuid"])},
+        )

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from app.model_training import train_model_v2
 
-activation_functions = Literal[
+ACTIVATION_FUNCTIONS = Literal[
     "elu",
     "exponential",
     "gelu",
@@ -23,7 +23,7 @@ activation_functions = Literal[
     "tanh",
 ]
 
-loss_functions = Literal[
+LOSS_FUNCTIONS = Literal[
     "binary_crossentropy",
     "binary_focal_crossentropy",
     "categorical_crossentropy",
@@ -47,7 +47,7 @@ loss_functions = Literal[
     "squared_hinge",
 ]
 
-optimizers = Literal[
+OPTIMIZERS = Literal[
     "adadelta",
     "adafactor",
     "adagrad",
@@ -87,9 +87,9 @@ class DictionariesResponse(BaseModel):
 @app.get("/dictionaries", response_model=DictionariesResponse)
 def get_dictionaries():
     return {
-        "activation_functions": activation_functions.__args__,
-        "loss_functions": loss_functions.__args__,
-        "optimizers": optimizers.__args__,
+        "activation_functions": ACTIVATION_FUNCTIONS.__args__,
+        "loss_functions": LOSS_FUNCTIONS.__args__,
+        "optimizers": OPTIMIZERS.__args__,
     }
 
 
@@ -106,10 +106,10 @@ def train_model(
     background_tasks: BackgroundTasks,
     labels_field: Annotated[str, Form()],
     file: Annotated[UploadFile, Form()],
-    activation: Annotated[activation_functions, Form()] = "relu",
-    additional_activation: Annotated[activation_functions, Form()] = "softmax",
-    loss: Annotated[loss_functions, Form()] = "categorical_crossentropy",
-    optimizer: Annotated[optimizers, Form()] = "adam",
+    activation: Annotated[ACTIVATION_FUNCTIONS, Form()] = "relu",
+    additional_activation: Annotated[ACTIVATION_FUNCTIONS, Form()] = "softmax",
+    loss: Annotated[LOSS_FUNCTIONS, Form()] = "categorical_crossentropy",
+    optimizer: Annotated[OPTIMIZERS, Form()] = "adam",
     batch_size: Annotated[int, Form()] = 64,
     epochs: Annotated[int, Form()] = 5,
     test_size: Annotated[float, Form()] = 0.2,
@@ -143,4 +143,4 @@ def train_model(
 
 # Train model API endpoint (END)
 
-# To run the server: uvicorn main:app --reload
+# To run the server without docker: uvicorn app.main:app --reload
