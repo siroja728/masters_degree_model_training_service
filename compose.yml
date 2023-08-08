@@ -10,4 +10,5 @@ services:
       - ./app:/model_service/app
       - ./models:/model_service/models
       - ./data:/model_service/data
+      - ./predictions:/model_service/predictions
     restart: "no"

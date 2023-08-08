@@ -4,6 +4,7 @@ from typing import Annotated, List, Literal
 from fastapi import BackgroundTasks, FastAPI, Form, UploadFile
 from pydantic import BaseModel
 
+from app.model_predict import predict
 from app.model_training import train_model_v2
 
 ACTIVATION_FUNCTIONS = Literal[
@@ -142,5 +143,34 @@ def train_model(
 
 
 # Train model API endpoint (END)
+
+# Predict API endpoint (BEGIN)
+
+
+@app.post("/predict_model")
+def model_predict(
+    background_tasks: BackgroundTasks,
+    file: Annotated[UploadFile, Form()],
+    path_to_model: Annotated[str, Form()],
+    path_to_weights: Annotated[str, Form()],
+):
+    prediction_uuid = uuid.uuid4()
+    background_tasks.add_task(
+        predict,
+        file_path=file.file,
+        model_path=path_to_model,
+        model_weights_path=path_to_weights,
+        prediction_uuid=prediction_uuid,
+    )
+
+    return {
+        "model_path": path_to_model,
+        "model_weights_path": path_to_weights,
+        "prediction_uuid": str(prediction_uuid),
+        "predicting": True,
+    }
+
+
+# Predict API endpoint (END)
 
 # To run the server without docker: uvicorn app.main:app --reload

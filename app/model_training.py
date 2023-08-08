@@ -61,16 +61,21 @@ def save_model(model, uuid):
     }
 
 
-def load_model(path_to_model):
-    # load json and create model
-    json_file = open(path_to_model + "/model.json", "r")
-    loaded_model_json = json_file.read()
-    json_file.close()
-    loaded_model = model_from_json(loaded_model_json)
-    # load weights into new model
-    loaded_model.load_weights(path_to_model + "/model.h5")
-    print("Loaded model from disk")
-    return loaded_model
+def load_model(path_to_model, path_to_weight):
+    if path_to_model:
+        # load json and create model
+        json_file = open(path_to_model, "r")
+        loaded_model_json = json_file.read()
+        json_file.close()
+        loaded_model = model_from_json(loaded_model_json)
+
+    if path_to_weight:
+        # load weights into new model
+        loaded_model.load_weights(path_to_weight)
+
+    if path_to_model and path_to_weight:
+        print("Loaded model from disk")
+        return loaded_model
 
 
 def train_model(
