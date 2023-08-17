@@ -2,28 +2,29 @@ import datetime
 import os
 
 import numpy as np
-import tensorflow as tf
-from keras import layers
-from keras.models import model_from_json
+from keras.layers import Dense
+from keras.losses import SparseCategoricalCrossentropy
+from keras.metrics import SparseCategoricalAccuracy
+from keras.models import Sequential, model_from_json
+from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
-from tensorflow import keras
 
 from app.processing_data import read_and_prepare_data
 
 
 def create_model(max_label):
-    model = keras.Sequential(
+    model = Sequential(
         [
-            layers.Dense(max_label, activation="relu"),
-            layers.Dense(max_label, activation="relu"),
-            layers.Dense(max_label, activation="relu"),
+            Dense(max_label, activation="relu"),
+            Dense(max_label, activation="relu"),
+            Dense(max_label, activation="relu"),
         ]
     )
 
     model.compile(
         optimizer="adam",
-        loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-        metrics=[keras.metrics.SparseCategoricalAccuracy()],
+        loss=SparseCategoricalCrossentropy(from_logits=True),
+        metrics=[SparseCategoricalAccuracy()],
     )
 
     return model
@@ -115,27 +116,23 @@ def train_model_v2(
 
         # Convert labels to one-hot encoding
         num_classes = len(np.unique(y))  # Number of unique classes in the labels
-        y_train = tf.keras.utils.to_categorical(y_train, num_classes)
-        y_test = tf.keras.utils.to_categorical(y_test, num_classes)
+        y_train = to_categorical(y_train, num_classes)
+        y_test = to_categorical(y_test, num_classes)
 
         # Build the neural network model
-        model = tf.keras.Sequential()
+        model = Sequential()
         model.add(
-            tf.keras.layers.Dense(
+            Dense(
                 num_classes,
                 activation=config["activation"],
                 input_shape=(X_train.shape[1],),
             )
         )
-        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-        model.add(tf.keras.layers.Dense(num_classes, activation=config["activation"]))
-        model.add(
-            tf.keras.layers.Dense(
-                num_classes, activation=config["additional_activation"]
-            )
-        )
+        model.add(Dense(num_classes, activation=config["activation"]))
+        model.add(Dense(num_classes, activation=config["activation"]))
+        model.add(Dense(num_classes, activation=config["activation"]))
+        model.add(Dense(num_classes, activation=config["activation"]))
+        model.add(Dense(num_classes, activation=config["additional_activation"]))
 
         # Compile the model
         model.compile(
