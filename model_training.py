@@ -9,6 +9,7 @@ def train_model(data, job_token):
     activation = data["configuration"]["activation"]
     loss = data["configuration"]["loss"]
     layers = data["configuration"]["layers"]
+    batch_size = data["configuration"]["batch_size"]
     model_id = data["processStructureId"]
 
     models_dir = "models"
@@ -44,8 +45,8 @@ def train_model(data, job_token):
             )
         )
 
-    model.compile(optimizer=optimizer, loss=loss, metrics=["accuracy"])
-    model.fit(train_x, train_y, epochs=epochs, batch_size=1, verbose=1)
+    model.compile(optimizer=optimizer, loss=loss, metrics=["mse"])
+    model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1)
 
     loss, accuracy = model.evaluate(test_x, test_y)
 

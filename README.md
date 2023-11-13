@@ -13,7 +13,7 @@ This is a service that allow user to train model and make a predictions using te
 - ###  Without docker:
     - Install Python
     - In root folder run `pip install -r requirements.txt`
-    - After successful install of all requirements run `python main.py`
+    - After successful install of all requirements run `uvicorn app.main:app --reload`
 
 ## Rebuild project
 If you add a new lib too requirements.txt you need to rebuild all services (Maybe there is another way too do that but I'm not a Pro in docker) `docker-compose up --build`

@@ -72,14 +72,3 @@ async def enqueue_job(data: dict):
 if __name__ == "__main__":
     # Start the worker in the background
     start_background_tasks()
-
-    # Start the FastAPI server
-    uvicorn.run(
-        "main:app",
-        host="localhost",
-        port=8000,
-        log_level="info",
-        reload=True,
-        reload_dirs=["."],
-        workers=1,
-    )
