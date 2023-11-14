@@ -44,6 +44,7 @@ def train_model(data, job_token):
                 4, input_shape=(train_x.shape[1],), activation=activation
             )
         )
+    model.add(tf.keras.layers.Dense(1, activation="linear"))
 
     model.compile(optimizer=optimizer, loss=loss, metrics=["mse"])
     model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1)

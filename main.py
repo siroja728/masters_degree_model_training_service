@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from model_training import train_model
 
 LOSS_FUNCTIONS = Literal["mean_squared_error", "mean_absolute_error"]
-ACTIVATION_FUNCTIONS = Literal["linear", "relu", "tanh", "sigmoid"]
+ACTIVATION_FUNCTIONS = Literal["linear", "relu", "sigmoid"]
 OPTIMIZERS = Literal["adam", "rmsprop", "sgd", "adagrad"]
 
 
