@@ -7,7 +7,7 @@ from bullmq import Queue, Worker
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from model_training import train_model
+from model_service import train_model
 
 LOSS_FUNCTIONS = Literal["mean_squared_error", "mean_absolute_error"]
 ACTIVATION_FUNCTIONS = Literal["linear", "relu", "sigmoid"]

@@ -55,3 +55,7 @@ def train_model(data, job_token):
 
     print(f"Loss on test data: {loss}")
     print(f"Accuracy on test data: {accuracy}")
+
+
+def model_predict(model, prediction_data):
+    return True
