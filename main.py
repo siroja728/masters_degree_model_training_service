@@ -2,7 +2,6 @@ import asyncio
 import threading
 from typing import List, Literal
 
-import uvicorn
 from bullmq import Queue, Worker
 from fastapi import FastAPI
 from pydantic import BaseModel
