@@ -25,12 +25,14 @@ class ParametersResponse(BaseModel):
     optimizers: List
 
 
+app = FastAPI()
+queue = Queue("jobs")
+
+
 async def process(job, job_token):
     return train_model(job.data, job_token)
 
 
-app = FastAPI()
-queue = Queue("jobs")
 worker = Worker("jobs", process, {"connection": {"host": "localhost", "port": 6379}})
 
 

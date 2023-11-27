@@ -82,10 +82,25 @@ def train_model(data, job_token):
 
         print(f"Loss on test data: {loss}")
         print(f"Accuracy on test data: {accuracy}")
-        print(f"Add job to responses queue that indicate that job is finished.")
+        print(f"Added job to responses queue that indicate that job is finished.")
+
     except:
         print("An exception occurred")
 
 
-def model_predict(model, prediction_data):
-    return True
+def predict_model(model, input_data):
+    try:
+        # Convert input data to the appropriate format (tensor)
+        input_tensor = tf.convert_to_tensor([input_data["data"]], dtype=tf.float32)
+
+        # Make predictions using the trained model
+        predictions = model.predict(input_tensor)
+
+        # Post-process the predictions based on your specific use case
+        # For example, if the model predicts two values (x and y), you can format the results accordingly
+        formatted_predictions = {"x": predictions[0][0], "y": predictions[0][1]}
+
+        return formatted_predictions
+    except Exception as e:
+        print(f"An exception occurred during prediction: {str(e)}")
+        return None
