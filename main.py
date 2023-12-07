@@ -71,5 +71,4 @@ async def enqueue_job(data: dict):
 
 
 if __name__ == "__main__":
-    # Start the worker in the background
     start_background_tasks()
