@@ -84,8 +84,8 @@ def train_model(data, job_token):
         print(f"Accuracy on test data: {accuracy}")
         print(f"Added job to responses queue that indicate that job is finished.")
 
-    except:
-        print("An exception occurred")
+    except Exception as e:
+        raise Exception(e)
 
 
 def predict_model(model, input_data):
@@ -102,5 +102,4 @@ def predict_model(model, input_data):
 
         return formatted_predictions
     except Exception as e:
-        print(f"An exception occurred during prediction: {str(e)}")
-        return None
+        raise Exception(e)
